@@ -1,0 +1,13 @@
+{
+  "name": "nevdev",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Nicolas Bayet <nicolas.bayet@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "node-addon-api": "^3.0.2"
+  },
+  "devDependencies": {
+    "node-gyp": "^7.1.2"
+  }
+}
