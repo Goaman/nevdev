@@ -306,10 +306,15 @@ ifeq ($(strip $(foreach prefix,$(NO_LOAD),\
                  $(join ^,nevdev.target.mk)))),)
   include nevdev.target.mk
 endif
+ifeq ($(strip $(foreach prefix,$(NO_LOAD),\
+    $(findstring $(join ^,$(prefix)),\
+                 $(join ^,node_modules/node-addon-api/nothing.target.mk)))),)
+  include node_modules/node-addon-api/nothing.target.mk
+endif
 
 quiet_cmd_regen_makefile = ACTION Regenerating $@
 cmd_regen_makefile = cd $(srcdir); /home/odoo/projects/self/programming/nevdev/node_modules/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/home/odoo/.cache/node-gyp/15.0.1" "-Dnode_gyp_dir=/home/odoo/projects/self/programming/nevdev/node_modules/node-gyp" "-Dnode_lib_file=/home/odoo/.cache/node-gyp/15.0.1/<(target_arch)/node.lib" "-Dmodule_root_dir=/home/odoo/projects/self/programming/nevdev" "-Dnode_engine=v8" "--depth=." "-Goutput_dir=." "--generator-output=build" -I/home/odoo/projects/self/programming/nevdev/build/config.gypi -I/home/odoo/projects/self/programming/nevdev/node_modules/node-gyp/addon.gypi -I/home/odoo/.cache/node-gyp/15.0.1/include/node/common.gypi "--toplevel-dir=." binding.gyp
-Makefile: $(srcdir)/node_modules/node-gyp/addon.gypi $(srcdir)/build/config.gypi $(srcdir)/../../../../.cache/node-gyp/15.0.1/include/node/common.gypi $(srcdir)/binding.gyp
+Makefile: $(srcdir)/binding.gyp $(srcdir)/node_modules/node-addon-api/node_api.gyp $(srcdir)/../../../../.cache/node-gyp/15.0.1/include/node/common.gypi $(srcdir)/node_modules/node-gyp/addon.gypi $(srcdir)/build/config.gypi
 	$(call do_cmd,regen_makefile)
 
 # "all" is a concatenation of the "all" targets from all the included

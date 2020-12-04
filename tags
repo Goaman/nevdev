@@ -1,0 +1,22 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BITS_PER_LONG	src/cpp/main.cpp	15;"	d	file:
+DEV_INPUT_EVENT	src/cpp/main.cpp	21;"	d	file:
+EVENT_DEV_NAME	src/cpp/main.cpp	22;"	d	file:
+HelloWorld	src/cpp/main.cpp	/^Napi::String HelloWorld(const Napi::CallbackInfo& info) {$/;"	f	signature:(const Napi::CallbackInfo& info)
+Init	src/cpp/main.cpp	/^Napi::Object Init(Napi::Env env, Napi::Object exports) {$/;"	f	signature:(Napi::Env env, Napi::Object exports)
+InitAll	src/cpp/main.cpp	/^Napi::Object InitAll(Napi::Env env, Napi::Object exports) {$/;"	f	signature:(Napi::Env env, Napi::Object exports)
+LONG	src/cpp/main.cpp	18;"	d	file:
+NBITS	src/cpp/main.cpp	16;"	d	file:
+OFF	src/cpp/main.cpp	17;"	d	file:
+ScannDevice	src/cpp/main.cpp	/^Napi::String ScannDevice(const Napi::CallbackInfo& info) {$/;"	f	signature:(const Napi::CallbackInfo& info)
+is_event_device	src/cpp/main.cpp	/^int is_event_device(const struct dirent *dir) {$/;"	f	signature:(const struct dirent *dir)
+main	src/cpp/main.cpp	/^int main () {$/;"	f	signature:()
+print_device_info	src/cpp/main.cpp	/^static int print_device_info(int fd) {$/;"	f	file:	signature:(int fd)
+print_events	src/cpp/main.cpp	/^int print_events(int fd) {$/;"	f	signature:(int fd)
+scan_devices	src/cpp/main.cpp	/^char* scan_devices(void) {$/;"	f	signature:(void)
+test_bit	src/cpp/main.cpp	19;"	d	file:

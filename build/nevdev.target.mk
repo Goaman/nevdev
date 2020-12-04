@@ -14,6 +14,7 @@ DEFS_Debug := \
 	'-D__STDC_FORMAT_MACROS' \
 	'-DOPENSSL_NO_PINSHARED' \
 	'-DOPENSSL_THREADS' \
+	'-DNAPI_DISABLE_CPP_EXCEPTIONS' \
 	'-DBUILDING_NODE_EXTENSION' \
 	'-DDEBUG' \
 	'-D_DEBUG' \
@@ -27,6 +28,7 @@ CFLAGS_Debug := \
 	-Wextra \
 	-Wno-unused-parameter \
 	-m64 \
+	-I/usr/include/libevdev-1.0/ \
 	-g \
 	-O0
 
@@ -36,7 +38,6 @@ CFLAGS_C_Debug :=
 # Flags passed to only C++ files.
 CFLAGS_CC_Debug := \
 	-fno-rtti \
-	-fno-exceptions \
 	-std=gnu++1y
 
 INCS_Debug := \
@@ -46,7 +47,8 @@ INCS_Debug := \
 	-I/home/odoo/.cache/node-gyp/15.0.1/deps/openssl/openssl/include \
 	-I/home/odoo/.cache/node-gyp/15.0.1/deps/uv/include \
 	-I/home/odoo/.cache/node-gyp/15.0.1/deps/zlib \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/v8/include
+	-I/home/odoo/.cache/node-gyp/15.0.1/deps/v8/include \
+	-I/home/odoo/projects/self/programming/nevdev/node_modules/node-addon-api
 
 DEFS_Release := \
 	'-DNODE_GYP_MODULE_NAME=nevdev' \
@@ -60,6 +62,7 @@ DEFS_Release := \
 	'-D__STDC_FORMAT_MACROS' \
 	'-DOPENSSL_NO_PINSHARED' \
 	'-DOPENSSL_THREADS' \
+	'-DNAPI_DISABLE_CPP_EXCEPTIONS' \
 	'-DBUILDING_NODE_EXTENSION'
 
 # Flags passed to all source files.
@@ -70,6 +73,7 @@ CFLAGS_Release := \
 	-Wextra \
 	-Wno-unused-parameter \
 	-m64 \
+	-I/usr/include/libevdev-1.0/ \
 	-O3 \
 	-fno-omit-frame-pointer
 
@@ -79,7 +83,6 @@ CFLAGS_C_Release :=
 # Flags passed to only C++ files.
 CFLAGS_CC_Release := \
 	-fno-rtti \
-	-fno-exceptions \
 	-std=gnu++1y
 
 INCS_Release := \
@@ -89,13 +92,17 @@ INCS_Release := \
 	-I/home/odoo/.cache/node-gyp/15.0.1/deps/openssl/openssl/include \
 	-I/home/odoo/.cache/node-gyp/15.0.1/deps/uv/include \
 	-I/home/odoo/.cache/node-gyp/15.0.1/deps/zlib \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/v8/include
+	-I/home/odoo/.cache/node-gyp/15.0.1/deps/v8/include \
+	-I/home/odoo/projects/self/programming/nevdev/node_modules/node-addon-api
 
 OBJS := \
-	$(obj).target/$(TARGET)/src/cppsrc/main.o
+	$(obj).target/$(TARGET)/src/cpp/main.o
 
 # Add to the list of files we specially track dependencies for.
 all_deps += $(OBJS)
+
+# Make sure our dependencies are built before any of us.
+$(OBJS): | $(builddir)/nothing.a $(obj).target/node_modules/node-addon-api/nothing.a
 
 # CFLAGS et al overrides must be target-local.
 # See "Target-specific Variable Values" in the GNU Make manual.
@@ -128,12 +135,13 @@ LDFLAGS_Release := \
 	-rdynamic \
 	-m64
 
-LIBS :=
+LIBS := \
+	-levdev
 
 $(obj).target/nevdev.node: GYP_LDFLAGS := $(LDFLAGS_$(BUILDTYPE))
 $(obj).target/nevdev.node: LIBS := $(LIBS)
 $(obj).target/nevdev.node: TOOLSET := $(TOOLSET)
-$(obj).target/nevdev.node: $(OBJS) FORCE_DO_CMD
+$(obj).target/nevdev.node: $(OBJS) $(obj).target/node_modules/node-addon-api/nothing.a FORCE_DO_CMD
 	$(call do_cmd,solink_module)
 
 all_deps += $(obj).target/nevdev.node

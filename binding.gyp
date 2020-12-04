@@ -1,18 +1,28 @@
 {
     "targets": [{
         "target_name": "nevdev",
-        # "cflags!": [ "-fno-exceptions" ],
-        # "cflags_cc!": [ "-fno-exceptions" ],
         "sources": [
-            "src/cppsrc/main.cpp",
+            "src/cpp/main.cpp",
         ],
-        # 'include_dirs': [
-        #     "<!@(node -p \"require('node-addon-api').include\")"
-        # ],
-        # 'libraries': [],
-        # 'dependencies': [
-        #     "<!(node -p \"require('node-addon-api').gyp\")"
-        # ],
-        # 'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
+        "cflags": [
+            '<!@(pkg-config --cflags libevdev)',
+        ],
+        "cflags!": [
+            "-fno-exceptions",
+        ],
+        "cflags_cc!": [ "-fno-exceptions" ],
+        'include_dirs': [
+            "<!@(node -p \"require('node-addon-api').include\")"
+        ],
+        'ldflags': [
+            '<!@(pkg-config --libs-only-L --libs-only-other libevdev)'
+        ],
+        'libraries': [
+            '<!@(pkg-config --libs-only-l libevdev)'
+        ],
+        'dependencies': [
+            "<!(node -p \"require('node-addon-api').gyp\")"
+        ],
+        'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ]
     }]
 }
