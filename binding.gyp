@@ -2,7 +2,7 @@
     "targets": [{
         "target_name": "nevdev",
         "sources": [
-            "src/cpp/main.cpp",
+            "src/cpp/main.cc",
         ],
         "cflags": [
             '<!@(pkg-config --cflags libevdev)',

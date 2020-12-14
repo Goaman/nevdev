@@ -1,0 +1,7 @@
+import { Device } from '../src/ts/Device';
+
+describe('Device', () => {
+  it('all', async () => {
+    new Device('name');
+  });
+});

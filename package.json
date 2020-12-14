@@ -1,20 +1,31 @@
 {
   "name": "nevdev",
   "version": "0.0.1",
-  "main": "index.js",
   "author": "Nicolas Bayet <nicolas.bayet@gmail.com>",
   "license": "MIT",
+  "main": "build-ts/js/main.js",
+  "types": "build-ts/js/main.d.ts",
   "gypfile": true,
   "scripts": {
-    "build": "node-gyp rebuild",
+    "build": "node-gyp rebuild; tsc",
+    "build:ts": "tsc",
+    "build:cpp": "node-gyp rebuild",
     "clean": "node-gyp clean",
     "configure": "node-gyp configure build"
   },
   "dependencies": {
-    "@types/node": "^14.14.10",
     "node-addon-api": "^3.0.2"
   },
   "devDependencies": {
-    "node-gyp": "^7.1.2"
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "typescript-eslint": "^0.0.1-alpha.0",
+    "@types/node": "^14.14.10",
+    "@typescript-eslint/parser": "^4.9.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "node-gyp": "^7.1.2",
+    "prettier": "^1.18.2",
+    "typescript": "^4.1.2"
   }
 }

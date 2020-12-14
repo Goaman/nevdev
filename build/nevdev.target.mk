@@ -41,14 +41,14 @@ CFLAGS_CC_Debug := \
 	-std=gnu++1y
 
 INCS_Debug := \
-	-I/home/odoo/.cache/node-gyp/15.0.1/include/node \
-	-I/home/odoo/.cache/node-gyp/15.0.1/src \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/openssl/config \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/openssl/openssl/include \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/uv/include \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/zlib \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/v8/include \
-	-I/home/odoo/projects/self/programming/nevdev/node_modules/node-addon-api
+	-I/home/goaman/.cache/node-gyp/15.3.0/include/node \
+	-I/home/goaman/.cache/node-gyp/15.3.0/src \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/openssl/config \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/openssl/openssl/include \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/uv/include \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/zlib \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/v8/include \
+	-I/home/goaman/projects/self/programming/nevdev/node_modules/node-addon-api
 
 DEFS_Release := \
 	'-DNODE_GYP_MODULE_NAME=nevdev' \
@@ -86,14 +86,14 @@ CFLAGS_CC_Release := \
 	-std=gnu++1y
 
 INCS_Release := \
-	-I/home/odoo/.cache/node-gyp/15.0.1/include/node \
-	-I/home/odoo/.cache/node-gyp/15.0.1/src \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/openssl/config \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/openssl/openssl/include \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/uv/include \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/zlib \
-	-I/home/odoo/.cache/node-gyp/15.0.1/deps/v8/include \
-	-I/home/odoo/projects/self/programming/nevdev/node_modules/node-addon-api
+	-I/home/goaman/.cache/node-gyp/15.3.0/include/node \
+	-I/home/goaman/.cache/node-gyp/15.3.0/src \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/openssl/config \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/openssl/openssl/include \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/uv/include \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/zlib \
+	-I/home/goaman/.cache/node-gyp/15.3.0/deps/v8/include \
+	-I/home/goaman/projects/self/programming/nevdev/node_modules/node-addon-api
 
 OBJS := \
 	$(obj).target/$(TARGET)/src/cpp/main.o
@@ -112,15 +112,15 @@ $(OBJS): GYP_CXXFLAGS := $(DEFS_$(BUILDTYPE)) $(INCS_$(BUILDTYPE))  $(CFLAGS_$(B
 
 # Suffix rules, putting all outputs into $(obj).
 
-$(obj).$(TOOLSET)/$(TARGET)/%.o: $(srcdir)/%.cpp FORCE_DO_CMD
+$(obj).$(TOOLSET)/$(TARGET)/%.o: $(srcdir)/%.cc FORCE_DO_CMD
 	@$(call do_cmd,cxx,1)
 
 # Try building from generated source, too.
 
-$(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj).$(TOOLSET)/%.cpp FORCE_DO_CMD
+$(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj).$(TOOLSET)/%.cc FORCE_DO_CMD
 	@$(call do_cmd,cxx,1)
 
-$(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj)/%.cpp FORCE_DO_CMD
+$(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj)/%.cc FORCE_DO_CMD
 	@$(call do_cmd,cxx,1)
 
 # End of this set of suffix rules

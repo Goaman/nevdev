@@ -1,65 +1,107 @@
-import * as fs from "fs";
-import * as util from "util";
-const close = util.promisify(fs.close);
+// import * as map from './map';
 
-function getDevice(filepath: fs.PathLike) {
-  fs.open(filepath, fs.constants.O_NONBLOCK, (err, fd) => {
-    if (err) throw err;
-    new Device(fd);
-  });
-}
+import * as fs from 'fs';
+import { promisify } from 'util';
+import { Device, UInput, nextEventLoop, NevEvent } from './Device';
+import { constants, eventTypes, eventDefinitions } from './map';
 
-class Device {
-  fd: number;
+// const addon = require('../../build/Release/nevdev.node');
 
-  constructor(filedescriptor: number) {
-    this.fd = filedescriptor;
-  }
+export { Device, constants, eventTypes };
 
-  /**
-   * Close the file descriptor of this device.
-   */
-  close() {
-    close(this.fd);
-  }
+// const open = promisify(fs.open);
+// const readdir = promisify(fs.readdir);
 
-  /**
-   *  Grab or ungrab the device through a kernel EVIOCGRAB. This prevents other
-    * clients (including kernel-internal ones such as rfkill) from receiving
-    * events from this device.
-    *
-    * This is generally a bad idea. Don't do this.
-    *
-    * Grabbing an already grabbed device, or ungrabbing an ungrabbed device is
-    * a noop and always succeeds.
-    *
-    * A grab is an operation tied to a file descriptor, not a device. If a
-    * client changes the file descriptor with libevdev_change_fd(), it must
-    * also re-issue a grab with libevdev_grab().
-    */
-  grab() {
+// (async () => {
+//   const device = await Device.create('/dev/input/event28');
+//   // device.grab();
+//   // device.ungrab();
+//   const uinput = new UInput('amazing device2');
+//   device.on('event', async (event) => {
+//     console.log('should write twiceevent:', event);
+//     // setTimeout(()=>{
 
-  }
-  /**
-   * Ungrab the device.
-   *
-   * @see grab()
-   */
-  ungrab() {
+//     // uinput.write({
+//     //   type: constants.EV_KEY,
+//     //   code: event.code + 1,
+//     //   value: 1,
+//     // });
+//     // uinput.sync();
+//     // uinput.write({
+//     //   type: constants.EV_KEY,
+//     //   code: event.code + 1,
+//     //   value: 0,
+//     // });
+//     // uinput.sync();
+//     // })
+//     // setTimeout
+//     // const otherEvent: NevEvent = {
+//     //   type: constants.EV_KEY,
+//     //   code: constants.KEY_5,
+//     //   value: 1,
+//     // };
+//     // uinput.write(otherEvent);
+//     // uinput.sync();
+//     // const otherEvent2: NevEvent = {
+//     //   type: constants.EV_KEY,
+//     //   code: constants.KEY_5,
+//     //   value: 0,
+//     // };
+//     // uinput.write(otherEvent2);
+//     // uinput.sync();
 
-  }
-}
+//     // uinput.write(event);
+//     // uinput.sync();
+//     // uinput.write(event);
+//     // uinput.sync();
+//     // uinput.write(event);
+//     // uinput.sync();
+//     await nextEventLoop();
 
-enum GrabMode {
-  /**
-   * Grab the device if not currently grabbed
-   */
-	GRAB = 3,
-  /**
-   * Ungrab the device if currently grabbed
-   */
-  UNGRAB = 4,
-}
+//     // uinput.write(event);
+//     // uinput.sync();
+//     // uinput.write(event);
+//     // uinput.sync();
+//     // uinput.write(event);
+//     // uinput.sync();
+//     // uinput.write(event);
+//     // uinput.sync();
+//     // uinput.write(event);
+//     // uinput.sync();
+//   });
+// })();
 
+// // export async function listDevices(): string[] {
+// //   const files = await readdir('/dev/input');
+// //   const names: string[] = [];
+// //   for (const file of files) {
+// //     if (file.startsWith('event')) {
+// //       const filepath = `/dev/input/${file}`;
+// //       const fd = await open(filepath, 'r');
+// //       const dev = addon.libevdev_new_from_fd(fd);
+// //       const name = addon.libevdev_get_name(dev);
+// //       console.log(filepath, ':', name);
+// //     }
+// //   }
+// // }
 
+// // export async function isDevice(path: string): boolean {
+// //   throw new Error('to implement');
+// // }
 
+// // addon.makename();
+// // addon.makename();
+
+// // setInterval(() => {
+// //   // console.log(
+// //   //   'udev, constants.EV_KEY, constants.KEY_1, 1:',
+// //   //   udev,
+// //   //   constants.EV_KEY,
+// //   //   constants.KEY_1,
+// //   //   1,1
+// //   // );
+// //   console.log('should type 1');
+// //   // addon.libevdev_uinput_write_event(udev, constants.EV_KEY, constants.KEY_1, 1);
+// //   // addon.libevdev_uinput_write_event(udev, constants.EV_KEY, constants.KEY_1, 0);
+// //   // addon.libevdev_uinput_write_event(udev, constants.EV_SYN, constants.SYN_REPORT, 1);
+// // }, 1000);
