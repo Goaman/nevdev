@@ -1,10 +1,53 @@
+import { EventTypeNames, EventConstants } from './constantNames';
+
 export interface EventTypeDefinition {
+  /**
+   * The name of the type.
+   */
   name: string;
+  /**
+   * The event codes that the type has.
+   */
   events: Record<number, string[]>;
 }
-export type EventTypeDefinitions = Record<number, EventTypeDefinition>;
+/**
+ * A map from the event type number to it's definition
+ */
+export type EventMap = Record<number, EventTypeDefinition>;
 
-export const eventTypes: EventTypeDefinitions = {
+/**
+ * The integer constants defined in `linux/input.h` and
+ * `linux/input-event-codes.h`.
+ *
+ * Exposed constants:
+ *
+ * ```
+ * SYN, REL, ABS, MSC, SW, LED, SND, REP, FF, FF_STATUS, KEY, ID, BUS, INPUT_PROP
+ * ```
+ *
+ * The EventCodes provide a reverse and forward mappings of the names and values
+ * of the above mentioned constants:
+ *
+ * ```
+ * > eventCodes.KEY_A
+ * 30
+ *
+ * > eventCodes.KEY[30]
+ * ['KEY_A'] // One key can have multiples names.
+ *
+ * > eventCodes.REL[0]
+ * ['REL_X']
+ *
+ * eventCodes.bytype[eventCodes.EV_REL][0]
+ * ['REL_X']
+ * ```
+ */
+export type EventCodes = {
+  byTypes: Record<number, Record<number, string[]>>;
+} & Record<EventTypeNames, Record<number, string>> &
+  Record<EventConstants, number>;
+
+export const eventMap: EventMap = {
   /**
    * Keys and buttons
    *
@@ -948,15 +991,60 @@ export const eventTypes: EventTypeDefinitions = {
   },
   0x15: {
     name: 'EV_FF',
-    events: {},
+    events: {
+      /**
+       * Force feedback effect types
+       */
+      0x50: ['FF_RUMBLE', 'FF_EFFECT_MIN'],
+      0x51: ['FF_PERIODIC'],
+      0x52: ['FF_CONSTANT'],
+      0x53: ['FF_SPRING'],
+      0x54: ['FF_FRICTION'],
+      0x55: ['FF_DAMPER'],
+      0x56: ['FF_INERTIA'],
+      0x57: ['FF_RAMP', 'FF_EFFECT_MAX'],
+
+      /**
+       * Force feedback periodic effect types
+       */
+
+      0x58: ['FF_SQUARE', 'FF_WAVEFORM_MIN'],
+      0x59: ['FF_TRIANGLE'],
+      0x5a: ['FF_SINE'],
+      0x5b: ['FF_SAW_UP'],
+      0x5c: ['FF_SAW_DOWN'],
+      0x5d: ['FF_CUSTOM', 'FF_WAVEFORM_MAX'],
+
+      /**
+       * Set ff device properties
+       */
+      /**
+       * ff->playback(effect_id = FF_GAIN) is the first effect_id to
+       * cause a collision with another ff method, in this case ff->set_gain().
+       * Therefore the greatest safe value for effect_id is FF_GAIN - 1,
+       * and thus the total number of effects should never exceed FF_GAIN.
+       */
+      0x60: ['FF_GAIN', 'FF_MAX_EFFECTS'],
+      0x61: ['FF_AUTOCENTER'],
+
+      0x7f: ['FF_MAX'],
+      0x80: ['FF_CNT'],
+    },
   },
+
   0x16: {
     name: 'EV_PWR',
     events: {},
   },
   0x17: {
     name: 'EV_FF_STATUS',
-    events: {},
+    events: {
+      /**
+       * Values describing the status of a force-feedback effect
+       */
+      0x00: ['FF_STATUS_STOPPED'],
+      0x01: ['FF_STATUS_PLAYING', 'FF_STATUS_MAX'],
+    },
   },
   0x1f: {
     name: 'EV_MAX',
@@ -968,26 +1056,74 @@ export const eventTypes: EventTypeDefinitions = {
   },
 };
 
-interface EventDefinition {
-  code: number;
-  typeName: string;
-  typeCode: number;
-}
-type EventDefinitions = Record<string, EventDefinition>;
+const IdConstants: Record<number, string[]> = {
+  0: ['ID_BUS'],
+  1: ['ID_VENDOR'],
+  2: ['ID_PRODUCT'],
+  3: ['ID_VERSION'],
+};
+const BusConstants: Record<number, string[]> = {
+  0x01: ['BUS_PCI'],
+  0x02: ['BUS_ISAPNP'],
+  0x03: ['BUS_USB'],
+  0x04: ['BUS_HIL'],
+  0x05: ['BUS_BLUETOOTH'],
+  0x06: ['BUS_VIRTUAL'],
 
-export const eventDefinitions: EventDefinitions = {};
-export const constants: Record<string, number> = {};
+  0x10: ['BUS_ISA'],
+  0x11: ['BUS_I8042'],
+  0x12: ['BUS_XTKBD'],
+  0x13: ['BUS_RS232'],
+  0x14: ['BUS_GAMEPORT'],
+  0x15: ['BUS_PARPORT'],
+  0x16: ['BUS_AMIGA'],
+  0x17: ['BUS_ADB'],
+  0x18: ['BUS_I2C'],
+  0x19: ['BUS_HOST'],
+  0x1a: ['BUS_GSC'],
+  0x1b: ['BUS_ATARI'],
+  0x1c: ['BUS_SPI'],
+  0x1d: ['BUS_RMI'],
+  0x1e: ['BUS_CEC'],
+  0x1f: ['BUS_INTEL_ISHTP'],
+};
+const InputPropConstants: Record<number, string[]> = {
+  0x00: ['INPUT_PROP_POINTER'] /* needs a pointer */,
+  0x01: ['INPUT_PROP_DIRECT'] /* direct input devices */,
+  0x02: ['INPUT_PROP_BUTTONPAD'] /* has button(s) under pad */,
+  0x03: ['INPUT_PROP_SEMI_MT'] /* touch rectangle only */,
+  0x04: ['INPUT_PROP_TOPBUTTONPAD'] /* softbuttons at top of pad */,
+  0x05: ['INPUT_PROP_POINTING_STICK'] /* is a pointing stick */,
+  0x06: ['INPUT_PROP_ACCELEROMETER'] /* has accelerometer */,
 
-for (const [eventTypeCode, eventTypeInfo] of Object.entries(eventTypes)) {
-  constants[eventTypeInfo.name] = parseInt(eventTypeCode);
+  0x1f: ['INPUT_PROP_MAX'],
+  0x20: ['INPUT_PROP_CNT'],
+};
+
+// Make an untyped eventCodes to fill it more easily.
+const untypedEventCodes: any = {
+  byTypes: {},
+};
+
+for (const [eventTypeCode, eventTypeInfo] of Object.entries(eventMap)) {
+  const eventTypeCodeNumber = parseInt(eventTypeCode);
+  untypedEventCodes.byTypes[eventTypeCodeNumber] = eventTypeInfo.events;
+  untypedEventCodes[eventTypeInfo.name] = eventTypeCodeNumber;
+  const simplifiedTypeName = eventTypeInfo.name.slice(4);
+  untypedEventCodes[simplifiedTypeName] = {};
+
   for (const [eventCode, eventNames] of Object.entries(eventTypeInfo.events)) {
+    const eventCodeNumber = parseInt(eventCode);
+    untypedEventCodes[simplifiedTypeName][eventCodeNumber] = eventNames;
+
     for (const eventName of eventNames) {
-      constants[eventName] = parseInt(eventCode);
-      eventDefinitions[eventName] = {
-        code: parseInt(eventCode),
-        typeName: eventTypeInfo.name,
-        typeCode: parseInt(eventTypeCode),
-      };
+      untypedEventCodes[eventName] = eventCodeNumber;
     }
   }
 }
+
+untypedEventCodes.ID = IdConstants;
+untypedEventCodes.BUS = BusConstants;
+untypedEventCodes.INPUT_PROP = InputPropConstants;
+
+export const eventCodes = untypedEventCodes as EventCodes;
