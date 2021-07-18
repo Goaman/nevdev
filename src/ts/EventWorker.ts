@@ -16,6 +16,10 @@ const fd: number = workerData;
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const event: EvdevEvent = addon.libevdev_next_event(dev, ReadFlag.BLOCKING);
+    // When the device is removed, usec will be 0. Return to finish this worker.
+    if (!event.usec) {
+      return;
+    }
     parentPort.postMessage(`${event.type}:${event.code}:${event.value}:${event.sec}:${event.usec}`);
 
     await nextEventLoop();

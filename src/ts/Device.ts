@@ -78,12 +78,9 @@ export class UInput {
     this.write({ type: eventCodes.EV_SYN, code: eventCodes.SYN_REPORT, value: 0 });
   }
   enableEventType(type: number): void {
-    console.log('enable event type:', type);
-    console.log('enable event dev:', this._dev);
     addon.libevdev_enable_event_type(this._dev, type);
   }
   enableEventCode(type: number, code: number, data = addon.NULL): void {
-    console.log('enableEventCode', type, code);
     addon.libevdev_enable_event_code(this._dev, type, code, addon.NULL);
   }
   supportKeyboards(): void {
@@ -109,13 +106,14 @@ export class UInput {
 
 type EventCallback = (event: EvdevEvent) => void;
 
-const _grabbedDevices: Set<Device> = new Set();
-
 export class Device {
+  static grabbedDevices: Set<Device> = new Set();
+
   private _fd: number;
   private _dev: any;
   private _emitter: EventEmitter;
   private _listening = false;
+  private _worker: Worker;
 
   static async create(identifiable: string): Promise<Device> {
     const fd = await open(identifiable, 'r');
@@ -136,7 +134,7 @@ export class Device {
             fs.accessSync(filepath, fs.constants.R_OK);
             readable = true;
           } catch (e) {
-            // console.log('error:', e);
+            console.warn('impossible` to access file ', filepath);
           }
           return readable;
         })
@@ -166,9 +164,6 @@ export class Device {
   get uniq(): string {
     return addon.libevdev_get_uniq(this._dev);
   }
-  // get uniq(): string {
-  //   return addon.libevdev_get_uniq(this._dev);
-  // }
   set uniq(value: string) {
     addon.libevdev_set_uniq(this._dev, value);
   }
@@ -199,14 +194,17 @@ export class Device {
   get driver_version(): number {
     return addon.libevdev_get_driver_version(this._dev);
   }
+  free() {
+    return addon.libevdev_free(this._dev);
+  }
 
   listen(): void {
     if (this._listening) return;
     this._listening = true;
-    const worker = new Worker(path.join(__dirname, '../../build-ts/js/LoopWorker.js'), {
+    this._worker = new Worker(path.join(__dirname, '../../build-ts/js/EventWorker.js'), {
       workerData: this._fd,
     });
-    worker.on('message', (message) => {
+    this._worker.on('message', (message) => {
       const [type, code, value] = message.split(':');
       const event: EvdevEvent = {
         type: parseInt(type),
@@ -240,7 +238,7 @@ export class Device {
    */
   grab(): void {
     addon.libevdev_grab(this._dev, GrabMode.GRAB);
-    _grabbedDevices.add(this);
+    Device.grabbedDevices.add(this);
   }
   /**
    * Ungrab the device.
@@ -249,7 +247,7 @@ export class Device {
    */
   ungrab(): void {
     addon.libevdev_grab(this._dev, GrabMode.UNGRAB);
-    _grabbedDevices.delete(this);
+    Device.grabbedDevices.delete(this);
   }
 
   onEvent(callback: EventCallback): void {
@@ -257,6 +255,9 @@ export class Device {
   }
   removeAllListeners(): void {
     this._emitter.removeAllListeners('event');
+  }
+  terminate() {
+    this._worker.terminate();
   }
   // capabilities() {}
   // activeKeys() {}
@@ -270,14 +271,3 @@ process.stdin.resume();
 // process.on('SIGINT', () => {});
 
 // Using a single function to handle multiple signals
-
-// function handle(signal: any) {
-//   console.log('_grabbedDevices:', _grabbedDevices);
-//   for (const device of _grabbedDevices) {
-//     device.ungrab();
-//   }
-//   process.exit();
-// }
-
-// process.on('SIGINT', handle);
-// process.on('SIGTERM', handle);
